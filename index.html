@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src https://docs.google.com; form-action 'none'; base-uri 'self'; object-src 'none'">
+<title>Chord Lab — מילון אקורדים</title>
+<meta name="description" content="מילון אקורדים דיגיטלי בעברית — תווי האקורד עם איות אנהרמוני נכון, ותצוגת פסנתר.">
+<meta name="theme-color" content="#f5f7ff">
+<meta property="og:title" content="Chord Lab — מילון אקורדים">
+<meta property="og:description" content="בחרו אקורד וראו את התווים שלו, עם איות נכון (C ≠ B♯), על פסנתר.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">
+      <div class="logo-icon" aria-hidden="true">♩</div>
+      <div><h1>Chord Lab</h1><p>מילון אקורדים דיגיטלי</p></div>
+    </div>
+    <div class="hdr-actions">
+      <a class="pill-btn download-btn" href="downloads/chord-lab.htm" download="chord-lab.htm">↓ הורד לשימוש לא מקוון</a>
+      <button id="sol-toggle" class="pill-btn" type="button" aria-pressed="false">דו רה מי</button>
+      <button class="pill-btn" type="button" data-open-feedback>משוב</button>
+      <button id="help-btn" class="pill-btn round" type="button" aria-label="עזרה">?</button>
+    </div>
+  </header>
+
+  <noscript><p class="noscript">הכלי דורש JavaScript.</p></noscript>
+
+  <main>
+    <section class="card" aria-labelledby="h-pick">
+      <div class="card-hdr"><span class="dot"></span><h2 id="h-pick">בחירת אקורד</h2></div>
+      <div class="card-body">
+        <div><div class="sec-lbl" id="l-root">תו בסיס</div><div class="btn-row" id="root-sel" role="group" aria-labelledby="l-root"></div></div>
+        <div><div class="sec-lbl" id="l-acc">היתק</div><div class="btn-row" id="acc-sel" role="group" aria-labelledby="l-acc"></div></div>
+        <div><div class="sec-lbl" id="l-type">סוג אקורד</div><div class="btn-row" id="type-sel" role="group" aria-labelledby="l-type"></div></div>
+        <hr class="div">
+        <form id="manual-form" novalidate>
+          <label class="sec-lbl" for="manual">הקלדה ידנית</label>
+          <div class="input-row">
+            <input type="text" id="manual" class="txt-input" dir="ltr" maxlength="24" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="C#m7 , Gbmaj7 , Bsus4 ...">
+            <button class="go-btn" type="submit">הצג</button>
+          </div>
+          <p id="manual-msg" class="msg" role="status"></p>
+        </form>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-out">
+      <div class="card-hdr">
+        <span class="dot"></span><h2 id="h-out">תוצאה</h2>
+        <button id="copy-link" class="link-btn" type="button">🔗 העתק קישור</button>
+      </div>
+      <div class="chord-hero">
+        <div class="chord-name" id="chord-name" dir="ltr"></div>
+        <div class="chord-type-lbl" id="chord-type"></div>
+      </div>
+      <div class="notes-row" id="notes-row" dir="ltr" role="group"></div>
+      <div class="info-sections">
+        <div class="info-block"><div class="info-lbl">שמות וסימונים נוספים</div><div class="info-val" id="aliases" dir="ltr"></div></div>
+        <div class="info-block" id="enh-block" hidden>
+          <div class="info-lbl">אותם קלידים, איות שונה</div>
+          <div id="enh-list"></div>
+          <p class="info-explain" id="exotic-note" hidden>באיות הזה יש היתקים משולשים — זה נכון תאורטית, אבל בפועל כותבים בדרך כלל את השקול האנהרמוני.</p>
+        </div>
+        <div class="info-block"><div class="info-lbl">מבנה ואופי האקורד</div><p class="info-explain" id="explain"></p></div>
+      </div>
+      <div class="piano-box"><div class="piano-wrap" id="piano"></div></div>
+    </section>
+  </main>
+
+  <footer>
+    <button type="button" class="link-btn" data-open-feedback>יש הצעה או באג? שלחו משוב</button>
+    <span>חישוב האקורדים: <a href="https://github.com/tonaljs/tonal" target="_blank" rel="noopener">Tonal</a> (MIT)</span>
+  </footer>
+</div>
+
+<div id="live" class="sr-only" role="status" aria-live="polite"></div>
+<div id="toast" class="toast" aria-hidden="true"></div>
+
+<dialog id="help-dialog" aria-labelledby="help-title">
+  <div class="card-hdr"><span class="dot"></span><h2 id="help-title">אודות Chord Lab</h2></div>
+  <div class="dlg-body">
+    <p>בחרו אקורד וראו את תוויו על מקלדת פסנתר.</p>
+    <p><strong>בחירה מהירה:</strong> תו בסיס, היתק (כולל במול כפול ודיאז כפול) וסוג.</p>
+    <p><strong>הקלדה ידנית:</strong> <code dir="ltr">F#m7</code>, <code dir="ltr">Bbmaj7</code>, <code dir="ltr">Cø</code>, <code dir="ltr">Ebb</code>…</p>
+    <p><strong>איות נכון:</strong> אקורד C מורכב מ־C E G, אקורד B♯ מורכב מ־B♯ D𝄪 F𝄪. הקלידים זהים, אבל השמות — לא. הפסנתר מסמן את הקלידים ומציג עליהם את האיות של האקורד שנבחר.</p>
+    <p><strong>קישור:</strong> כתובת הדף משתנה עם האקורד, אפשר לשתף או לרענן.</p>
+  </div>
+  <div class="dlg-ft"><button class="close-btn" type="button" data-close>הבנתי, תודה</button></div>
+</dialog>
+
+<dialog id="fb-dialog" aria-labelledby="fb-title">
+  <div class="card-hdr"><span class="dot"></span><h2 id="fb-title">משוב</h2></div>
+  <form id="fb-form" class="dlg-body" novalidate>
+    <div class="sec-lbl" id="fb-rate-lbl">מה דעתך הכללית?</div>
+    <div id="fb-stars" class="stars" role="radiogroup" aria-labelledby="fb-rate-lbl">
+      <button type="button" class="star" role="radio" aria-checked="false" aria-label="כוכב אחד">★</button>
+      <button type="button" class="star" role="radio" aria-checked="false" aria-label="2 כוכבים">★</button>
+      <button type="button" class="star" role="radio" aria-checked="false" aria-label="3 כוכבים">★</button>
+      <button type="button" class="star" role="radio" aria-checked="false" aria-label="4 כוכבים">★</button>
+      <button type="button" class="star" role="radio" aria-checked="false" aria-label="5 כוכבים">★</button>
+    </div>
+    <div id="fb-rating-label" class="rating-lbl" aria-hidden="true"></div>
+    <label class="sec-lbl" for="fb-text">מה אפשר לשפר?</label>
+    <textarea id="fb-text" class="txt-input" rows="4" maxlength="2000"></textarea>
+    <label class="sec-lbl" for="fb-email">כתובת מייל (לא חובה)</label>
+    <input id="fb-email" class="txt-input" type="email" dir="ltr" autocomplete="email">
+    <p id="fb-status" class="fb-status" role="status"></p>
+    <div class="dlg-actions">
+      <button id="fb-submit" class="go-btn" type="submit">שליחה</button>
+      <button class="ghost-btn" type="button" data-close>ביטול</button>
+    </div>
+  </form>
+  <div id="fb-thanks" class="dlg-body thanks" hidden>
+    <p>תודה על המשוב! 🙏</p>
+    <button id="fb-thanks-close" class="close-btn" type="button" data-close>סגירה</button>
+  </div>
+</dialog>
+
+<script src="js/vendor/tonal.min.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/piano.js"></script>
+<script src="js/feedback.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
