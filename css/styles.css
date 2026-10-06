@@ -63,8 +63,8 @@ input.txt-input{margin-bottom:.4rem}
 .info-sections{display:flex;flex-direction:column;gap:.9rem;padding:1rem 1.375rem 1.25rem}
 .info-lbl{font-size:.66rem;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:.2rem}
 .info-val,.enh-row{font-family:var(--fm);font-size:.8rem;color:#b0aba0}
-.enh-row{display:flex;gap:.7rem;direction:ltr;justify-content:flex-end}
-.enh-row b{color:var(--gold-hi);font-weight:500}
+.enh-row{display:block;width:max-content;direction:ltr;color:var(--gold-hi);font-weight:700;text-decoration:underline;text-underline-offset:3px;margin-top:.3rem}
+.enh-row:hover{color:var(--gold)}
 .info-explain{font-size:.86rem;color:#a29d95;line-height:1.7}
 .piano-box{padding:0 1.375rem 1.375rem}
 .piano-wrap{position:relative;height:130px;direction:ltr;background:#0c0e14;border:1px solid rgba(255,255,255,.06);border-radius:var(--rs);overflow:hidden}
