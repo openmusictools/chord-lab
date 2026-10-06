@@ -53,13 +53,16 @@
   function noteLabel(note, mode) {
     const n = Note.get(note);
     if (n.empty) return note;
-    return mode === 'sol' ? SOLFEGE[n.letter] + ACC_SYM[n.acc] : n.letter + n.acc;
+    const symbols = [...n.acc].map(a => a === '#' ? '♯' : '♭').join('');
+    return mode === 'sol' ? SOLFEGE[n.letter] + symbols : n.letter + n.acc;
   }
 
   /** Spoken Hebrew name, e.g. "פה דיאז כפול". */
   function noteHebrewFull(note) {
     const n = Note.get(note);
-    return SOLFEGE[n.letter] + (n.acc ? ' ' + ACC_HE[n.acc] : '');
+    if (n.empty) return String(note);
+    const accidental = ACC_HE[n.acc] || (n.acc ? (n.acc[0] === '#' ? 'דיאז' : 'במול') + ' פי ' + n.acc.length : '');
+    return SOLFEGE[n.letter] + (accidental ? ' ' + accidental : '');
   }
 
   /** Build everything we show for a chord, given a spelled root ("C#", "Bbb") and a Tonal alias. */
@@ -82,7 +85,7 @@
     const enharmonic = [];
     for (const l of LETTERS) for (const a of ACCIDENTALS) {
       const r = l + a;
-      if (r === root.pc || Note.get(r).chroma !== root.chroma || accCount(r) > 1) continue;
+      if (r === root.pc || Note.get(r).chroma !== root.chroma) continue;
       const alt = Chord.getChord(canonical, r);
       if (alt.empty || alt.notes.some((n) => accCount(n) > 2)) continue;
       enharmonic.push({ name: r + suffix, root: r, notes: alt.notes });
@@ -95,7 +98,7 @@
       explain: known ? known.explain : null,
       known: !!known,
       aliases: [...new Set(c.aliases.map((a) => root.pc + a))].filter((n) => n !== root.pc + suffix).slice(0, 6),
-      enharmonic: enharmonic.slice(0, 2),
+      enharmonic,
       keyLow: Math.min(...keys.map(k => k.midi)) - (root.chroma === 1 || root.chroma === 3 || root.chroma === 6 || root.chroma === 8 || root.chroma === 10 ? 1 : 0),
       keyHigh: (() => { const high = Math.max(...keys.map(k => k.midi)); return [1,3,6,8,10].includes(high % 12) ? high + 1 : high; })(),
       exotic: c.notes.some((n) => accCount(n) > 2)
