@@ -108,3 +108,48 @@ test('compact keyboard preserves actual ascending voicing', () => {
   assert.equal(E.parse('C').chord.keyHigh - E.parse('C').chord.keyLow, 7);
   assert.deepEqual(Array.from(E.parse('B13').chord.keys, k => k.midi), [71,75,78,81,85,92]);
 });
+
+// Independent arithmetic oracle: letter distance and accidental displacement.
+test('all 107 chord types × 35 roots: independent spelling, labels and enharmonic names', () => {
+  const natural = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+  const pitch = n => natural[n[0]] + [...n.slice(1)].reduce((v, a) => v + (a === '#' ? 1 : -1), 0);
+  const pc = n => ((pitch(n) % 12) + 12) % 12;
+  let count = 0;
+  for (const type of Tonal.ChordType.all()) for (const letter of E.LETTERS) for (const acc of E.ACCIDENTALS) {
+    const c = E.build(letter + acc, type.aliases[0]);
+    assert.ok(c);
+    c.intervals.forEach((iv, i) => {
+      const [, number, quality] = iv.match(/^(\d+)(P|M|m|A+|d+)$/);
+      const num = Number(number), degree = (num - 1) % 7;
+      const perfect = [0, 3, 4].includes(degree);
+      let offset = quality === 'm' ? -1 : quality[0] === 'A' ? quality.length : quality[0] === 'd' ? -quality.length - (perfect ? 0 : 1) : 0;
+      const semitones = [0, 2, 4, 5, 7, 9, 11][degree] + 12 * Math.floor((num - 1) / 7) + offset;
+      assert.equal(pc(c.notes[i]), (pc(c.root) + semitones) % 12, c.name + ' pitch');
+      assert.equal(c.notes[i][0], E.LETTERS[(E.LETTERS.indexOf(letter) + num - 1) % 7], c.name + ' letter');
+      assert.equal(c.keys[i].midi, 60 + pc(c.root) + semitones, c.name + ' keyboard');
+      const degreeText = (offset < 0 ? '♭'.repeat(-offset) : '♯'.repeat(offset)) + num;
+      assert.equal(c.degrees[i], degreeText, c.name + ' degree');
+      assert.ok(!E.noteLabel(c.notes[i], 'sol').includes('undefined'), c.name + ' solfege');
+      assert.ok(!E.noteHebrewFull(c.notes[i]).includes('undefined'), c.name + ' spoken');
+    });
+    for (const alt of c.enharmonic) {
+      const parsed = E.parse(alt.name);
+      assert.ok(parsed.ok, alt.name);
+      assert.equal(parsed.chord.notes.join(' '), alt.notes.join(' '), alt.name);
+      assert.deepEqual(alt.notes.map(pc), c.notes.map(pc), c.name + ' = ' + alt.name);
+      assert.ok(alt.notes.every(n => n.slice(1).length <= 2));
+    }
+    count++;
+  }
+  assert.equal(count, Tonal.ChordType.all().length * 35);
+});
+
+test('double-accidental equivalents and rare spellings stay readable', () => {
+  assert.ok(E.parse('C').chord.enharmonic.some(c => c.name === 'Dbb'));
+  assert.ok(E.parse('Dbb').chord.enharmonic.some(c => c.name === 'C'));
+  assert.equal(E.noteLabel('D###', 'sol'), 'רה♯♯♯');
+  assert.equal(E.noteHebrewFull('D###'), 'רה דיאז פי 3');
+  assert.equal(E.noteLabel('Bbbb', 'sol'), 'סי♭♭♭');
+  assert.equal(E.noteHebrewFull('Bbbb'), 'סי במול פי 3');
+  assert.equal(E.parse('G##aug').chord.notes.join(' '), 'G## B## D###');
+});
