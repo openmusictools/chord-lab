@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-IaB8xVGUrrPVwb00dSBQUWCR/9uQHkBni2I8mf9RTs0=' 'sha256-PbSEVJJFGdE4pr6eOqqpG37gWvnt6QOG7AaDGESIm7Y=' 'sha256-f8VIwTsnMO7ipRwaoaFhnC1ic2q6X4XBOsjgfgLLGY4=' 'sha256-RFWh+VMkuP1wH9saed9rqgu/rGBEzT2va3LeKDSrTCI=' 'sha256-26+LEvHCLz32Kc7OSuU3agDZmOoe8ARG/nm03jvNWE0=' 'sha256-WCYSBUvCNnE2y6WYNysDVVYav3bYiSS39SZ1th8BD48='; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src https://docs.google.com; form-action 'none'; base-uri 'self'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-IaB8xVGUrrPVwb00dSBQUWCR/9uQHkBni2I8mf9RTs0=' 'sha256-PbSEVJJFGdE4pr6eOqqpG37gWvnt6QOG7AaDGESIm7Y=' 'sha256-f8VIwTsnMO7ipRwaoaFhnC1ic2q6X4XBOsjgfgLLGY4=' 'sha256-RFWh+VMkuP1wH9saed9rqgu/rGBEzT2va3LeKDSrTCI=' 'sha256-Bshin/MoC6auHF3A739bC4EDNbWWcR4LxEivzYC1ub4=' 'sha256-WCYSBUvCNnE2y6WYNysDVVYav3bYiSS39SZ1th8BD48='; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src https://docs.google.com; form-action 'none'; base-uri 'self'; object-src 'none'">
 <title>Chord Lab — מילון אקורדים</title>
 <meta name="description" content="מילון אקורדים דיגיטלי בעברית — תווי האקורד עם איות אנהרמוני נכון, ותצוגת פסנתר.">
 <meta name="theme-color" content="#f5f7ff">
@@ -90,8 +90,8 @@ input.txt-input{margin-bottom:.4rem}
 .info-sections{display:flex;flex-direction:column;gap:.9rem;padding:1rem 1.375rem 1.25rem}
 .info-lbl{font-size:.66rem;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:.2rem}
 .info-val,.enh-row{font-family:var(--fm);font-size:.8rem;color:#b0aba0}
-.enh-row{display:flex;gap:.7rem;direction:ltr;justify-content:flex-end}
-.enh-row b{color:var(--gold-hi);font-weight:500}
+.enh-row{display:block;width:max-content;direction:ltr;color:var(--gold-hi);font-weight:700;text-decoration:underline;text-underline-offset:3px;margin-top:.3rem}
+.enh-row:hover{color:var(--gold)}
 .info-explain{font-size:.86rem;color:#a29d95;line-height:1.7}
 .piano-box{padding:0 1.375rem 1.375rem}
 .piano-wrap{position:relative;height:130px;direction:ltr;background:#0c0e14;border:1px solid rgba(255,255,255,.06);border-radius:var(--rs);overflow:hidden}
@@ -219,7 +219,7 @@ body{background-image:radial-gradient(ellipse at 5% 0,#dcf8f0,transparent 45%),r
         <div class="info-block"><div class="info-lbl">שמות וסימונים נוספים</div><div class="info-val" id="aliases" dir="ltr"></div></div>
         <div class="info-block" id="enh-block" hidden>
           <div class="info-lbl">שמות אנהרמוניים</div>
-          <p class="info-explain">שמות שונים לאותם צלילים בכיוון מושווה של 12 חצאי טון. התווים מוצגים באיות המתאים לכל שורש.</p>
+          <p class="info-explain">שמות שונים לאותם צלילים.</p>
           <div id="enh-list"></div>
           <p class="info-explain" id="exotic-note" hidden>באיות הזה יש היתקים משולשים — זה נכון תאורטית, אבל בפועל כותבים בדרך כלל את השקול האנהרמוני.</p>
         </div>
@@ -667,11 +667,22 @@ body{background-image:radial-gradient(ellipse at 5% 0,#dcf8f0,transparent 45%),r
     enh.hidden = !(chord.enharmonic.length || chord.exotic);
     const list = $('enh-list'); list.textContent = '';
     chord.enharmonic.forEach((e) => {
-      const row = document.createElement('div');
+      const row = document.createElement('a');
       row.className = 'enh-row';
-      const b = document.createElement('b'); b.textContent = e.name;
-      const n = document.createElement('span'); n.textContent = e.notes.map((x) => E.noteLabel(x, mode())).join(' · ');
-      row.append(b, n);
+      const target = new URL(location.href);
+      target.search = '';
+      target.hash = '';
+      target.searchParams.set('root', e.root);
+      target.searchParams.set('type', chord.tonal);
+      target.searchParams.set('sol', sol ? '1' : '0');
+      row.href = target.href;
+      row.textContent = e.name;
+      row.setAttribute('aria-label', `הצג את האקורד ${e.name}`);
+      row.addEventListener('click', (event) => {
+        event.preventDefault();
+        const next = E.build(e.root, chord.tonal);
+        if (next) setChord(next, 'push');
+      });
       list.appendChild(row);
     });
     $('exotic-note').hidden = !chord.exotic;
