@@ -98,11 +98,22 @@
     enh.hidden = !(chord.enharmonic.length || chord.exotic);
     const list = $('enh-list'); list.textContent = '';
     chord.enharmonic.forEach((e) => {
-      const row = document.createElement('div');
+      const row = document.createElement('a');
       row.className = 'enh-row';
-      const b = document.createElement('b'); b.textContent = e.name;
-      const n = document.createElement('span'); n.textContent = e.notes.map((x) => E.noteLabel(x, mode())).join(' · ');
-      row.append(b, n);
+      const target = new URL(location.href);
+      target.search = '';
+      target.hash = '';
+      target.searchParams.set('root', e.root);
+      target.searchParams.set('type', chord.tonal);
+      target.searchParams.set('sol', sol ? '1' : '0');
+      row.href = target.href;
+      row.textContent = e.name;
+      row.setAttribute('aria-label', `הצג את האקורד ${e.name}`);
+      row.addEventListener('click', (event) => {
+        event.preventDefault();
+        const next = E.build(e.root, chord.tonal);
+        if (next) setChord(next, 'push');
+      });
       list.appendChild(row);
     });
     $('exotic-note').hidden = !chord.exotic;
