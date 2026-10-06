@@ -134,3 +134,9 @@ body{background-image:radial-gradient(ellipse at 5% 0,#dcf8f0,transparent 45%),r
 .star{color:#c3c9d9}.star.on{color:#dc950c}
 .download-btn{display:inline-flex;align-items:center;text-decoration:none;height:auto;min-height:36px;padding:.5rem .9rem}
 @media(max-width:480px){.hdr-actions{gap:.5rem}.download-btn{order:3;width:100%;justify-content:center}.pk.hl .pk-lbl{font-size:.72rem}}
+
+/* Local Hebrew font and clear Latin chord symbols. */
+:root{--fb:'Heebo','Nunito',system-ui,sans-serif;--fd:'JetBrains Mono',monospace}
+.logo h1,.chord-name{font-family:var(--fd)}
+.note-chip,.pk-lbl,.enh-row{font-family:var(--fm),'Heebo',sans-serif}
+.info-lbl,.sec-lbl,.card-hdr h2{letter-spacing:normal}
