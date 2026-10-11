@@ -148,3 +148,11 @@ body{background-image:radial-gradient(ellipse at 5% 0,#dcf8f0,transparent 45%),r
 .piano-track-ready{transition:transform .38s ease-in-out,width .38s ease-in-out}
 .piano-wrap{transition:width .38s ease-in-out}
 @media(prefers-reduced-motion:reduce){.piano-track-ready,.piano-wrap{transition:none}}
+
+.piano-track .pk-lbl{transition:opacity .16s ease}
+.piano-labels-fading .pk-lbl{opacity:0}
+@media(prefers-reduced-motion:reduce){.piano-track .pk-lbl{transition:none}}
+
+.piano-track .pk{transition:opacity .16s ease}
+.piano-labels-fading .pk.hl{opacity:.35}
+@media(prefers-reduced-motion:reduce){.piano-track .pk{transition:none}}
