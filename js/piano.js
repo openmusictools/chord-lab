@@ -47,6 +47,17 @@
       key.appendChild(lbl);
       container.appendChild(key);
     }
+    // Keep the neighbouring black-key halves at cropped white-key boundaries.
+    // The keyboard wrapper clips the outside half; these keys are decorative.
+    for (const [midi, left] of [[low - 1, 0], [high + 1, 100]]) {
+      if (!BLACK[midi % 12]) continue;
+      const edge = el('pk b edge');
+      edge.dataset.midi = midi;
+      edge.style.left = left + '%';
+      edge.style.width = w * 0.62 + '%';
+      edge.setAttribute('aria-hidden', 'true');
+      container.appendChild(edge);
+    }
     container.setAttribute('role', 'img');
     container.setAttribute('aria-label', 'מקלדת פסנתר. תווי האקורד: ' + chord.notes.map(E.noteHebrewFull).join(', '));
   }
