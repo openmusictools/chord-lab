@@ -140,3 +140,5 @@ body{background-image:radial-gradient(ellipse at 5% 0,#dcf8f0,transparent 45%),r
 .logo h1,.chord-name{font-family:var(--fd)}
 .note-chip,.pk-lbl,.enh-row{font-family:var(--fm),'Heebo',sans-serif}
 .info-lbl,.sec-lbl,.card-hdr h2{letter-spacing:normal}
+
+.hdr-actions .pill-btn{min-height:36px;height:36px;padding-block:0;flex-shrink:0}
