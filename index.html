@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="css/fonts.css">
 <link rel="stylesheet" href="css/styles.css">
 <title>מילון אקורדים — Chord Lab</title><meta name="description" content="מילון אקורדים דיגיטלי בעברית: בחרו אקורד, גלו את התווים שלו, שמות אנהרמוניים ותצוגה על מקלדת פסנתר."><meta property="og:title" content="מילון אקורדים — Chord Lab"><meta property="og:description" content="מילון אקורדים דיגיטלי בעברית: בחרו אקורד, גלו את התווים שלו, שמות אנהרמוניים ותצוגה על מקלדת פסנתר."><meta property="og:url" content="https://openmusictools.github.io/chord-lab/"><meta property="og:type" content="website"><meta property="og:locale" content="he_IL"><link rel="canonical" href=""><link rel="stylesheet" href="seo.css"></head>
-<body>
+<body data-feedback-tool="מילון האקורדים">
 <div class="app">
   <header>
     <div class="logo">
@@ -115,14 +115,14 @@
     <textarea id="fb-text" class="txt-input" rows="4" maxlength="2000"></textarea>
     <label class="sec-lbl" for="fb-email">כתובת מייל (לא חובה)</label>
     <input id="fb-email" class="txt-input" type="email" dir="ltr" autocomplete="email">
-    <p id="fb-status" class="fb-status" role="status"></p>
+    <p class="fb-note">המשוב נשלח ל־Google Forms. כתובת העמוד מצורפת למשוב; מייל הוא לבחירתכם.</p><p id="fb-status" class="fb-status" role="status"></p>
     <div class="dlg-actions">
       <button id="fb-submit" class="go-btn" type="submit">שליחה</button>
       <button class="ghost-btn" type="button" data-close>ביטול</button>
     </div>
   </form>
   <div id="fb-thanks" class="dlg-body thanks" hidden>
-    <p>תודה על המשוב! 🙏</p>
+    <p>המשוב נשלח, תודה לך!</p>
     <button id="fb-thanks-close" class="close-btn" type="button" data-close>סגירה</button>
   </div>
 </dialog>
