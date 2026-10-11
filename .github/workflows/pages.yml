@@ -30,7 +30,7 @@ jobs:
       - name: Prepare static website
         run: |
           mkdir _site
-          cp index.html favicon.* icon-*.png apple-touch-icon.png site.webmanifest .nojekyll _site/
+          cp index.html sitemap.xml seo.css favicon.* icon-*.png apple-touch-icon.png site.webmanifest .nojekyll _site/
           cp -r assets css js downloads _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
