@@ -18,7 +18,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:1rem;pa
 .logo h1{font-family:var(--fd);font-size:1.9rem;font-weight:600;line-height:1;direction:ltr;background:linear-gradient(135deg,#f0eade 20%,var(--gold) 80%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .logo p{font-size:.7rem;color:var(--muted);letter-spacing:.06em;margin-top:2px}
 .hdr-actions{display:flex;gap:.4rem;flex-wrap:wrap}
-.pill-btn{height:36px;padding:0 .9rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9999px;color:var(--gold);font-size:.78rem;font-weight:700;cursor:pointer;transition:.15s}
+.pill-btn{appearance:none;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;font-family:inherit;line-height:1.5;text-decoration:none;margin:0;height:36px;padding:0 .9rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9999px;color:var(--gold);font-size:.78rem;font-weight:700;cursor:pointer;transition:.15s}
 .pill-btn.round{width:36px;padding:0;font-size:1.05rem}
 .pill-btn:hover,.pill-btn.on{background:var(--gold-glow);border-color:var(--gold-dim)}
 .pill-btn.on{color:var(--gold-hi)}
