@@ -142,3 +142,9 @@ body{background-image:radial-gradient(ellipse at 5% 0,#dcf8f0,transparent 45%),r
 .info-lbl,.sec-lbl,.card-hdr h2{letter-spacing:normal}
 
 .hdr-actions .pill-btn{min-height:36px;height:36px;padding-block:0;flex-shrink:0}
+
+/* One persistent keyboard moves behind the cropped viewport. */
+.piano-track{position:absolute;inset:0 auto 0 0;height:100%;direction:ltr}
+.piano-track-ready{transition:transform .38s ease-in-out,width .38s ease-in-out}
+.piano-wrap{transition:width .38s ease-in-out}
+@media(prefers-reduced-motion:reduce){.piano-track-ready,.piano-wrap{transition:none}}
