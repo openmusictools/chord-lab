@@ -2,12 +2,13 @@
 """Build a self-contained HTM, with fonts, icons, styles, JS and license notices."""
 from pathlib import Path
 import base64, hashlib, re, mimetypes, html
+from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 def data_uri(path):
     mime = mimetypes.guess_type(path.name)[0] or 'application/octet-stream'
     return 'data:' + mime + ';base64,' + base64.b64encode(path.read_bytes()).decode()
 def css_embed(match):
-    path = ROOT / match.group(1)
+    path = ROOT / urlsplit(match.group(1)).path
     text = path.read_text()
     def url_embed(m):
         rel = m.group(1).strip('"\' ')
@@ -18,7 +19,7 @@ page = (ROOT / 'index.html').read_text()
 page = re.sub(r'<link rel="stylesheet" href="([^"]+)">', css_embed, page)
 script_hashes = []
 def js_embed(m):
-    code = (ROOT / m.group(1)).read_text()
+    code = (ROOT / urlsplit(m.group(1)).path).read_text()
     code = re.sub(r'</script', r'<\\/script', code, flags=re.I)
     script_hashes.append("'sha256-" + base64.b64encode(hashlib.sha256(code.encode()).digest()).decode() + "'")
     return '<script>' + code + '</script>'
