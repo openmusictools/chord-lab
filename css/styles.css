@@ -158,7 +158,7 @@ body{background-image:radial-gradient(ellipse at 5% 0,#dcf8f0,transparent 45%),r
 @media(prefers-reduced-motion:reduce){.piano-track .pk{transition:none}}
 
 /* Progressive chord-type discovery */
-.type-actions{display:flex;flex-wrap:wrap;gap:.5rem}
+.type-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.85rem}
 .type-actions .ghost-btn{flex:1 1 160px;min-height:42px;color:var(--gold-hi);background:#f8f7ff;border-color:var(--border-hi)}
 .type-actions .ghost-btn:hover{background:#eeebff}
 #extended-types{border-top:1px solid var(--border);padding-top:.8rem}
