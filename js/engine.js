@@ -34,6 +34,31 @@
     { suffix: 'm7b5', tonal: 'm7b5', label: 'ø m7b5', he: 'חצי מוקטן', explain: 'מינור 7 עם קווינטה מוקטנת (6 חצאי טון). הדרגה ii במהלך ii–V–i בטונליות מינורית.' }
   ];
   const TYPE_BY_SUFFIX = new Map(TYPES.map((t) => [t.suffix, t]));
+  // Curated discovery tiers, independent of the order in Tonal.ChordType.all().
+  // Each Tonal type appears exactly once in the catalog. Aliases remain searchable.
+  const BASIC_ALIASES = ['M', 'm', '7', 'maj7', 'm7', 'sus2', 'sus4', 'dim', 'aug'];
+  const EXTENDED_ALIASES = [
+    '6', 'm6', 'dim7', 'm7b5', '9', 'maj9', 'm9', '11', 'm11',
+    '13', 'm13', 'maj13', 'add9', 'madd9', '7sus4', '9sus4',
+    '7b9', '7#9', '7#11', '7b13', '6/9', 'm6/9', 'mMaj7', 'maj7#5', '7b5'
+  ];
+  function canonicalAlias(alias) {
+    const c = Chord.getChord(alias, 'C');
+    return c.empty ? null : c.aliases[0];
+  }
+  const basicSet = new Set(BASIC_ALIASES.map(canonicalAlias).filter(Boolean));
+  const extendedSet = new Set(EXTENDED_ALIASES.map(canonicalAlias).filter(Boolean));
+  const CATALOG = Tonal.ChordType.all().map((type) => {
+    const tonal = type.aliases[0];
+    const known = TYPES.find((t) => canonicalAlias(t.tonal) === tonal);
+    return {
+      tonal,
+      label: known ? known.label : (type.aliases.find(Boolean) || tonal),
+      aliases: type.aliases.slice(),
+      level: basicSet.has(tonal) ? 'basic' : extendedSet.has(tonal) ? 'extended' : 'rare'
+    };
+  });
+
 
   const KEY_LOW = 60;  // C4 — the on-screen keyboard spans C4..B5
   const KEY_HIGH = 83;
@@ -135,5 +160,5 @@
     return build(letter + acc, t ? t.tonal : suffix);
   }
 
-  return { TYPES, LETTERS, ACCIDENTALS, ACC_SYM, KEY_LOW, KEY_HIGH, build, parse, fromParts, noteLabel, noteHebrewFull };
+  return { TYPES, CATALOG, LETTERS, ACCIDENTALS, ACC_SYM, KEY_LOW, KEY_HIGH, build, parse, fromParts, noteLabel, noteHebrewFull };
 });
