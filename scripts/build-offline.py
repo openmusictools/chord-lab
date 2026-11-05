@@ -26,8 +26,24 @@ def js_embed(m):
 page = re.sub(r'<script src="([^"]+)"></script>', js_embed, page)
 page = re.sub(r'<link rel="(?:manifest|canonical)"[^>]*>', '', page)
 page = re.sub(r'href="(favicon\.svg|favicon\.ico|apple-touch-icon\.png)"', lambda m: 'href="'+data_uri(ROOT/m.group(1))+'"', page)
-page = page.replace('href="downloads/chord-lab.htm"', 'href="#" id="offline-download"')
-extra = "document.getElementById('offline-download').addEventListener('click',function(e){e.preventDefault();var u=URL.createObjectURL(new Blob(['<!DOCTYPE html>\\n'+document.documentElement.outerHTML],{type:'text/html;charset=utf-8'}));var a=document.createElement('a');a.href=u;a.download='chord-lab.htm';a.click();setTimeout(function(){URL.revokeObjectURL(u)},1000)});"
+# Offline copies link to the current hosted version instead of downloading themselves.
+# Keep the link hidden until the browser reports an online connection.
+download_link = '<a class="pill-btn download-btn" href="downloads/chord-lab.htm" download="chord-lab.htm">↓ הורד לשימוש לא מקוון</a>'
+online_link = '<a class="pill-btn" id="online-version" href="https://openmusictools.github.io/chord-lab/" hidden style="display:none">השתמש בגרסה העדכנית</a>'
+if page.count(download_link) != 1:
+    raise RuntimeError('Expected exactly one offline download link in index.html')
+page = page.replace(download_link, online_link)
+extra = """(function(){
+  var link=document.getElementById('online-version');
+  function refresh(){
+    var online=navigator.onLine;
+    link.hidden=!online;
+    link.style.display=online?'':'none';
+  }
+  window.addEventListener('online',refresh);
+  window.addEventListener('offline',refresh);
+  refresh();
+})();"""
 script_hashes.append("'sha256-"+base64.b64encode(hashlib.sha256(extra.encode()).digest()).decode()+"'")
 page = page.replace('</body>', '<script>'+extra+'</script></body>')
 page = page.replace("script-src 'self'", 'script-src ' + ' '.join(script_hashes)).replace("style-src 'self'", "style-src 'unsafe-inline'").replace("font-src 'self'", "font-src data:").replace("img-src 'self' data:", "img-src data:")
