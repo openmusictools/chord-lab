@@ -153,3 +153,25 @@ test('double-accidental equivalents and rare spellings stay readable', () => {
   assert.equal(E.noteHebrewFull('Bbbb'), 'סי במול פי 3');
   assert.equal(E.parse('G##aug').chord.notes.join(' '), 'G## B## D###');
 });
+
+
+test('catalog covers all Tonal chord types exactly once and keeps important chords discoverable', () => {
+  const all = Tonal.ChordType.all();
+  assert.equal(E.CATALOG.length, all.length);
+  assert.equal(new Set(E.CATALOG.map(t => t.tonal)).size, all.length);
+  assert.ok(E.CATALOG.every(t => ['basic', 'extended', 'rare'].includes(t.level)));
+  assert.equal(E.CATALOG.filter(t => t.level === 'basic').length, 9);
+  for (const alias of ['M','m','7','maj7','m7','sus2','sus4','dim','aug']) {
+    const canonical = Tonal.Chord.getChord(alias, 'C').aliases[0];
+    assert.equal(E.CATALOG.find(t => t.tonal === canonical).level, 'basic', alias);
+  }
+  for (const alias of ['9', 'maj9', 'm9', 'dim7', 'm7b5']) {
+    const canonical = Tonal.Chord.getChord(alias, 'C').aliases[0];
+    assert.equal(E.CATALOG.find(t => t.tonal === canonical).level, 'extended', alias);
+  }
+  for (const type of E.CATALOG) {
+    const chord = E.build('C', type.tonal);
+    assert.ok(chord, 'cannot select ' + type.tonal);
+    assert.equal(chord.tonal, type.tonal);
+  }
+});
