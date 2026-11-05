@@ -29,7 +29,7 @@ page = re.sub(r'href="(favicon\.svg|favicon\.ico|apple-touch-icon\.png)"', lambd
 # Offline copies link to the current hosted version instead of downloading themselves.
 # Keep the link hidden until the browser reports an online connection.
 download_link = '<a class="pill-btn download-btn" href="downloads/chord-lab.htm" download="chord-lab.htm">↓ הורד לשימוש לא מקוון</a>'
-online_link = '<a class="pill-btn" id="online-version" href="https://openmusictools.github.io/chord-lab/" hidden style="display:none">השתמש בגרסה העדכנית</a>'
+online_link = '<a class="pill-btn" id="online-version" href="https://openmusictools.github.io/chord-lab/" hidden style="display:none">השתמש בגירסה העדכנית</a>'
 if page.count(download_link) != 1:
     raise RuntimeError('Expected exactly one offline download link in index.html')
 page = page.replace(download_link, online_link)
