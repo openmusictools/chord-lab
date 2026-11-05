@@ -35,21 +35,40 @@ if page.count(download_link) != 1:
 page = page.replace(download_link, online_link)
 extra = """(function(){
   var link=document.getElementById('online-version');
-  function refresh(){
-    var online=navigator.onLine;
-    link.hidden=!online;
-    link.style.display=online?'':'none';
+  var serial=0;
+  function show(visible){link.hidden=!visible;link.style.display=visible?'':'none';}
+  async function refresh(){
+    var current=++serial;
+    show(false);
+    if(!navigator.onLine)return;
+    var controller=new AbortController();
+    var timeout=setTimeout(function(){controller.abort();},5000);
+    try{
+      await fetch('https://openmusictools.github.io/chord-lab/',{
+        method:'HEAD',mode:'no-cors',cache:'no-store',
+        referrerPolicy:'no-referrer',signal:controller.signal
+      });
+      if(current===serial)show(true);
+    }catch(_){if(current===serial)show(false);}
+    finally{clearTimeout(timeout);}
   }
   window.addEventListener('online',refresh);
   window.addEventListener('offline',refresh);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)refresh();});
   refresh();
 })();"""
 script_hashes.append("'sha256-"+base64.b64encode(hashlib.sha256(extra.encode()).digest()).decode()+"'")
 page = page.replace('</body>', '<script>'+extra+'</script></body>')
-page = page.replace("script-src 'self'", 'script-src ' + ' '.join(script_hashes)).replace("style-src 'self'", "style-src 'unsafe-inline'").replace("font-src 'self'", "font-src data:").replace("img-src 'self' data:", "img-src data:")
+page = page.replace("script-src 'self'", 'script-src ' + ' '.join(script_hashes)).replace("style-src 'self'", "style-src 'unsafe-inline'").replace("font-src 'self'", "font-src data:").replace("img-src 'self' data:", "img-src data:").replace("connect-src https://docs.google.com", "connect-src https://docs.google.com https://openmusictools.github.io")
 licenses = [ROOT/'js/vendor/TONAL-LICENSE.txt', *sorted((ROOT/'assets/fonts').glob('OFL-*.txt'))]
 page = page.replace('</body>', '<details class="app"><summary>רישיונות צד שלישי</summary><pre dir="ltr" style="white-space:pre-wrap">'+html.escape('\n\n'.join(f.name+'\n'+f.read_text() for f in licenses))+'</pre></details></body>')
 output = ROOT/'downloads/chord-lab.htm'
 output.parent.mkdir(exist_ok=True)
+# Fail the build if the generated download regresses to the old download control.
+assert 'href="https://openmusictools.github.io/"' in page, 'Home button must remain visible'
+assert 'id="online-version"' in page, 'Latest-version button missing'
+assert 'href="downloads/chord-lab.htm"' not in page, 'Download button remained in standalone file'
+assert 'offline-download' not in page, 'Old re-download control remained'
+assert 'connect-src https://docs.google.com https://openmusictools.github.io' in page
 output.write_text(page)
 print(f'Built {output.name}: {output.stat().st_size:,} bytes')
