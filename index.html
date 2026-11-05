@@ -41,7 +41,16 @@
       <div class="card-body">
         <div><div class="sec-lbl" id="l-root">תו בסיס</div><div class="btn-row" id="root-sel" role="group" aria-labelledby="l-root"></div></div>
         <div><div class="sec-lbl" id="l-acc">היתק</div><div class="btn-row" id="acc-sel" role="group" aria-labelledby="l-acc"></div></div>
-        <div><div class="sec-lbl" id="l-type">סוג אקורד</div><div class="btn-row" id="type-sel" role="group" aria-labelledby="l-type"></div></div>
+        <div><div class="sec-lbl" id="l-type">סוג אקורד</div><div class="btn-row" id="type-sel" role="group" aria-labelledby="l-type"></div>
+        <div class="type-actions">
+          <button class="ghost-btn" id="more-types" type="button" aria-expanded="false" aria-controls="extended-types">הצג אקורדים מורחבים ▾</button>
+          <button class="ghost-btn" id="all-types-open" type="button">הצג את כל סוגי האקורדים</button>
+        </div>
+        <div id="extended-types" hidden>
+          <span class="sec-lbl">אקורדים מורחבים</span>
+          <div class="btn-row" id="extended-type-sel" role="group" aria-label="אקורדים מורחבים"></div>
+        </div>
+        <p id="rare-type-note" class="type-note" hidden>נבחר סוג אקורד מהקטלוג המלא. <button id="show-selected-type" type="button" class="link-btn">הצג ברשימת הסוגים</button></p></div>
         <hr class="div">
         <form id="manual-form" novalidate>
           <label class="sec-lbl" for="manual">הקלדה ידנית</label>
@@ -97,6 +106,16 @@
     <p><strong>קישור:</strong> כתובת הדף משתנה עם האקורד, אפשר לשתף או לרענן.</p>
   </div>
   <div class="dlg-ft"><button class="close-btn" type="button" data-close>הבנתי, תודה</button></div>
+</dialog>
+
+<dialog id="types-dialog" aria-labelledby="types-title" aria-modal="true">
+  <div class="card-hdr"><span class="dot"></span><h2 id="types-title">כל סוגי האקורדים</h2><button type="button" class="ghost-btn" id="types-close" aria-label="סגור">✕</button></div>
+  <div class="dlg-body">
+    <label class="sec-lbl" for="types-search">חיפוש לפי שם או סימון</label>
+    <input id="types-search" class="txt-input" type="search" autocomplete="off" placeholder="למשל: maj9, sus4, 7b9">
+    <p id="types-count" class="type-note" role="status"></p>
+    <div id="types-catalog"></div>
+  </div>
 </dialog>
 
 <dialog id="fb-dialog" aria-labelledby="fb-title">
