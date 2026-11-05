@@ -156,3 +156,19 @@ body{background-image:radial-gradient(ellipse at 5% 0,#dcf8f0,transparent 45%),r
 .piano-track .pk{transition:opacity .16s ease}
 .piano-labels-fading .pk.hl{opacity:.35}
 @media(prefers-reduced-motion:reduce){.piano-track .pk{transition:none}}
+
+/* Progressive chord-type discovery */
+.type-actions{display:flex;flex-wrap:wrap;gap:.5rem}
+.type-actions .ghost-btn{flex:1 1 160px;min-height:42px;color:var(--gold-hi);background:#f8f7ff;border-color:var(--border-hi)}
+.type-actions .ghost-btn:hover{background:#eeebff}
+#extended-types{border-top:1px solid var(--border);padding-top:.8rem}
+.type-note{font-size:.78rem;color:var(--muted);line-height:1.6}
+#types-dialog{width:min(92vw,760px);max-height:88dvh}
+#types-dialog .card-hdr{position:sticky;top:0;z-index:1;justify-content:space-between}
+#types-dialog .card-hdr h2{font-size:1rem}
+#types-dialog .dlg-body{display:flex;flex-direction:column;gap:.65rem}
+#types-dialog #types-search{font-family:var(--fb);min-height:44px;margin:0}
+.catalog-group{padding:.8rem 0;border-top:1px solid var(--border)}
+.catalog-group h3{font-size:.95rem;margin-bottom:.7rem;color:var(--cream)}
+.catalog-group .sel-btn{min-height:40px}
+@media(max-width:480px){#types-dialog{width:calc(100vw - 20px)}}
