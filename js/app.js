@@ -8,6 +8,8 @@
 
   let chord = null;
   let sol = false;
+  let expanded = false;
+  const LEVELS = [{id:'basic',name:'רגילים'},{id:'extended',name:'מורחבים'},{id:'rare',name:'נדירים'}];
 
   /* ---------- URL <-> state ---------- */
   function readUrl() {
@@ -48,11 +50,81 @@
       const small = a.length === 2 ? 'small' : '';
       accs.appendChild(makeBtn(text, { 'data-acc': a, 'aria-label': name, title: name }, small));
     });
-    E.TYPES.forEach((t) => types.appendChild(makeBtn(t.label, { 'data-type': t.suffix }, 'type-btn')));
+    E.CATALOG.filter(t => t.level === 'basic').forEach(t => types.appendChild(makeBtn(t.label, { 'data-type': t.tonal }, 'type-btn')));
+    E.CATALOG.filter(t => t.level === 'extended').forEach(t => $('extended-type-sel').appendChild(makeBtn(t.label, { 'data-type': t.tonal }, 'type-btn')));
+    try { expanded = localStorage.getItem('chordlab.types.expanded') === '1'; } catch (_) {}
+    setExpanded(expanded);
+    $('more-types').addEventListener('click', () => {
+      setExpanded(!expanded);
+      try { localStorage.setItem('chordlab.types.expanded', expanded ? '1' : '0'); } catch (_) {}
+    });
+    $('all-types-open').addEventListener('click', () => openCatalog());
+    $('show-selected-type').addEventListener('click', () => openCatalog(chord.tonal));
+    $('types-close').addEventListener('click', () => $('types-dialog').close());
+    $('types-dialog').addEventListener('click', e => { if (e.target === $('types-dialog')) $('types-dialog').close(); });
+    $('types-search').addEventListener('input', renderCatalog);
+    $('types-catalog').addEventListener('click', e => {
+      const b = e.target.closest('[data-catalog-type]');
+      if (!b) return;
+      const next = E.build(chord.root, b.dataset.catalogType);
+      if (next) { $('types-dialog').close(); setChord(next, 'push'); }
+    });
     roots.addEventListener('click', (e) => { const b = e.target.closest('[data-root]'); if (b) pick(b.dataset.root, chord.acc, chord.suffix); });
     accs.addEventListener('click', (e) => { const b = e.target.closest('[data-acc]'); if (b) pick(chord.letter, b.dataset.acc, chord.suffix); });
-    types.addEventListener('click', (e) => { const b = e.target.closest('[data-type]'); if (b) pick(chord.letter, chord.acc, b.dataset.type); });
+    for (const container of [types, $('extended-type-sel')]) {
+      container.addEventListener('click', e => {
+        const b = e.target.closest('[data-type]');
+        if (b) pick(chord.letter, chord.acc, b.dataset.type);
+      });
+    }
   }
+  function setExpanded(value) {
+    expanded = value;
+    $('extended-types').hidden = !value;
+    $('more-types').setAttribute('aria-expanded', String(value));
+    $('more-types').textContent = value ? 'הסתר אקורדים מורחבים ▴' : 'הצג אקורדים מורחבים ▾';
+  }
+  function renderCatalog() {
+    const search = $('types-search').value.trim().toLowerCase().replace(/♭/g, 'b').replace(/♯/g, '#');
+    const host = $('types-catalog');
+    host.replaceChildren();
+    let count = 0;
+    for (const group of LEVELS) {
+      const matches = E.CATALOG.filter(t => t.level === group.id &&
+        [t.label, ...t.aliases].some(alias => alias.toLowerCase().includes(search)));
+      if (!matches.length) continue;
+      count += matches.length;
+      const section = document.createElement('section');
+      section.className = 'catalog-group';
+      const heading = document.createElement('h3');
+      heading.textContent = group.name + ' (' + matches.length + ')';
+      section.appendChild(heading);
+      const row = document.createElement('div');
+      row.className = 'btn-row';
+      for (const type of matches) {
+        const btn = makeBtn(type.label, {'data-catalog-type':type.tonal,
+          'aria-pressed':String(chord.tonal === type.tonal),
+          title:type.aliases.join(', ')}, 'type-btn');
+        if (chord.tonal === type.tonal) btn.classList.add('on');
+        row.appendChild(btn);
+      }
+      section.appendChild(row);
+      host.appendChild(section);
+    }
+    $('types-count').textContent = count + ' מתוך ' + E.CATALOG.length + ' סוגי אקורדים';
+  }
+  function openCatalog(selected) {
+    $('types-search').value = '';
+    renderCatalog();
+    $('types-dialog').showModal();
+    $('types-search').focus();
+    if (selected) {
+      const btn = Array.from($('types-catalog').querySelectorAll('[data-catalog-type]'))
+        .find(b => b.dataset.catalogType === selected);
+      if (btn) btn.scrollIntoView({block:'nearest'});
+    }
+  }
+
   function pick(letter, acc, suffix) {
     const c = E.fromParts(letter, acc, suffix);
     if (c) setChord(c, 'push');
@@ -65,7 +137,8 @@
     });
     mark($('root-sel'), 'data-root', chord.letter);
     mark($('acc-sel'), 'data-acc', chord.acc);
-    mark($('type-sel'), 'data-type', chord.known ? chord.suffix : '\u0000');
+    mark($('type-sel'), 'data-type', chord.tonal);
+    mark($('extended-type-sel'), 'data-type', chord.tonal);
   }
 
   /* ---------- rendering ---------- */
@@ -122,6 +195,9 @@
     setText('explain', (chord.explain || `אקורד מסוג ${chord.typeHe}.`) + ' ' + formula + '.');
 
     ChordPiano.render($('piano'), chord, mode());
+    const selectedType = E.CATALOG.find(t => t.tonal === chord.tonal);
+    if (selectedType && selectedType.level === 'extended' && !expanded) setExpanded(true);
+    $('rare-type-note').hidden = !selectedType || selectedType.level !== 'rare';
     syncButtons();
     $('sol-toggle').setAttribute('aria-pressed', String(sol));
     $('sol-toggle').classList.toggle('on', sol);
