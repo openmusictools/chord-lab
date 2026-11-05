@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-IaB8xVGUrrPVwb00dSBQUWCR/9uQHkBni2I8mf9RTs0=' 'sha256-PbSEVJJFGdE4pr6eOqqpG37gWvnt6QOG7AaDGESIm7Y=' 'sha256-f8VIwTsnMO7ipRwaoaFhnC1ic2q6X4XBOsjgfgLLGY4=' 'sha256-RFWh+VMkuP1wH9saed9rqgu/rGBEzT2va3LeKDSrTCI=' 'sha256-Bshin/MoC6auHF3A739bC4EDNbWWcR4LxEivzYC1ub4=' 'sha256-WCYSBUvCNnE2y6WYNysDVVYav3bYiSS39SZ1th8BD48='; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src https://docs.google.com; form-action 'none'; base-uri 'self'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-IaB8xVGUrrPVwb00dSBQUWCR/9uQHkBni2I8mf9RTs0=' 'sha256-PbSEVJJFGdE4pr6eOqqpG37gWvnt6QOG7AaDGESIm7Y=' 'sha256-f8VIwTsnMO7ipRwaoaFhnC1ic2q6X4XBOsjgfgLLGY4=' 'sha256-RFWh+VMkuP1wH9saed9rqgu/rGBEzT2va3LeKDSrTCI=' 'sha256-Bshin/MoC6auHF3A739bC4EDNbWWcR4LxEivzYC1ub4=' 'sha256-sfKtWbn0u5Ivc1cTC7Z6ShP/nP8h7yaIdq9Dsvf2Xq8='; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src https://docs.google.com; form-action 'none'; base-uri 'self'; object-src 'none'">
 <title>Chord Lab — מילון אקורדים</title>
 <meta name="description" content="מילון אקורדים דיגיטלי בעברית — תווי האקורד עם איות אנהרמוני נכון, ותצוגת פסנתר.">
 <meta name="theme-color" content="#f5f7ff">
@@ -177,7 +177,7 @@ body{background-image:radial-gradient(ellipse at 5% 0,#dcf8f0,transparent 45%),r
       <div><h1>Chord Lab</h1><p>מילון אקורדים דיגיטלי</p></div>
     </div>
     <div class="hdr-actions">
-      <a class="pill-btn download-btn" href="#" id="offline-download" download="chord-lab.htm">↓ הורד לשימוש לא מקוון</a>
+      <a class="pill-btn" id="online-version" href="https://openmusictools.github.io/chord-lab/" hidden style="display:none">השתמש בגירסה העדכנית</a>
       <button id="sol-toggle" class="pill-btn" type="button" aria-pressed="false">דו רה מי</button>
       <button class="pill-btn" type="button" data-open-feedback>משוב</button>
       <button id="help-btn" class="pill-btn round" type="button" aria-label="עזרה">?</button>
@@ -778,7 +778,17 @@ body{background-image:radial-gradient(ellipse at 5% 0,#dcf8f0,transparent 45%),r
   init();
 })();
 </script>
-<script>document.getElementById('offline-download').addEventListener('click',function(e){e.preventDefault();var u=URL.createObjectURL(new Blob(['<!DOCTYPE html>\n'+document.documentElement.outerHTML],{type:'text/html;charset=utf-8'}));var a=document.createElement('a');a.href=u;a.download='chord-lab.htm';a.click();setTimeout(function(){URL.revokeObjectURL(u)},1000)});</script><details class="app"><summary>רישיונות צד שלישי</summary><pre dir="ltr" style="white-space:pre-wrap">TONAL-LICENSE.txt
+<script>(function(){
+  var link=document.getElementById('online-version');
+  function refresh(){
+    var online=navigator.onLine;
+    link.hidden=!online;
+    link.style.display=online?'':'none';
+  }
+  window.addEventListener('online',refresh);
+  window.addEventListener('offline',refresh);
+  refresh();
+})();</script><details class="app"><summary>רישיונות צד שלישי</summary><pre dir="ltr" style="white-space:pre-wrap">TONAL-LICENSE.txt
 The MIT License (MIT)
 
 Copyright (c) 2015 danigb
